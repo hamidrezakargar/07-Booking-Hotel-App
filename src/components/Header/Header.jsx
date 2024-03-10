@@ -6,6 +6,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
+import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
 // import { DateRange } from 'react-date-range';
 
 function Header() {
@@ -27,8 +28,8 @@ function Header() {
         }
     ]);
     const [openDate, setOpenDate] = useState(false);
-
-
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleOptions = (name, operation) => {
         setOptions(prev => {
@@ -37,6 +38,19 @@ function Header() {
                 [name]: operation == "inc" ? options[name] + 1 : options[name] - 1,
             };
 
+        });
+    };
+
+    const handleSearch = () => {
+        const encodedParams = createSearchParams({
+            date: JSON.stringify(date),
+            destination,
+            option: JSON.stringify(options),
+        });
+        // setSearchParams(encodedParams);
+        navigate({
+            pathname: "/hotels",
+            search: encodedParams.toString(),
         });
     };
 
@@ -59,18 +73,18 @@ function Header() {
                 </div>
                 <div className="headerSearchItem">
                     <HiCalendar className="headerIcon dateIcon" />
-                    <div 
-                    onClick={() => setOpenDate(!openDate)}  
-                    className="dateDropDown" >
+                    <div
+                        onClick={() => setOpenDate(!openDate)}
+                        className="dateDropDown" >
                         {`${format(date[0].startDate, "MM/dd/yyyy")} to ${format(date[0].endDate, "MM/dd/yyyy")} `}
                     </div>
                     {openDate && (
-                        <DateRange 
-                        onChange={(item) => setDate([item.selection])}
-                        ranges={date}
-                        className="date"
-                        minDate={new Date()}
-                        moveRangeOnFirstSelection={true}
+                        <DateRange
+                            onChange={(item) => setDate([item.selection])}
+                            ranges={date}
+                            className="date"
+                            minDate={new Date()}
+                            moveRangeOnFirstSelection={true}
                         />
                     )}
 
@@ -93,7 +107,9 @@ function Header() {
                     <span className="seperator" ></span>
                 </div>
                 <div className="headerSearchItem">
-                    <button className="headerSearchBtn" >
+                    <button
+                        onClick={handleSearch}
+                        className="headerSearchBtn" >
                         <HiSearch className="headerIcon" />
                     </button>
                 </div>
